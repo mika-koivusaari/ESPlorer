@@ -5,12 +5,15 @@
  */
 package ESPlorer.Connector;
 
+import java.awt.FlowLayout;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.DeploymentException;
 import javax.websocket.Session;
@@ -25,13 +28,17 @@ public class MicroPythonWebRepl implements Connector {
     ClientManager client=null;
     Session session=null;
     
+    JPanel configPane=null;
+    JPanel connectPane=null;
+    JTextField wsaddress=null;
+    
     @Override
     public void open() {
         try {
             //        final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
             
             client = ClientManager.createClient();
-            session=client.connectToServer(new MPWebReplEndPoint(), new URI("ws://192.168.0.112:8266"));
+            session=client.connectToServer(new MPWebReplEndPoint(), new URI(wsaddress.getText()));
         } catch (URISyntaxException ex) {
             Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DeploymentException ex) {
@@ -61,8 +68,27 @@ public class MicroPythonWebRepl implements Connector {
     }
 
     @Override
-    public JLayeredPane getConfig() {
+    public JPanel getConfigPane() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JPanel getConnectionPane() {
+        if (connectPane==null){
+            connectPane = new JPanel();
+//            connectPane.setMaximumSize(new java.awt.Dimension(300, 25));
+//            connectPane.setMinimumSize(new java.awt.Dimension(300, 25));
+            connectPane.setOpaque(true);
+//            LEDPanel.setLayer(PortOpenLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+            FlowLayout connectPaneLayout = new FlowLayout();
+            connectPane.setLayout(connectPaneLayout);
+            wsaddress = new JTextField("ws://192.168.0.112:8266",30);
+            wsaddress.setMaximumSize(new java.awt.Dimension(300, 25));
+            wsaddress.setMinimumSize(new java.awt.Dimension(100, 25));
+            wsaddress.setPreferredSize(new java.awt.Dimension(150, 25));
+            connectPane.add(wsaddress);
+        }
+        return connectPane;
     }
     
 }

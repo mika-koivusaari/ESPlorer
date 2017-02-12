@@ -6,6 +6,7 @@
 package ESPlorer.Connector;
 
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -31,5 +32,9 @@ public interface Connector {
      * send Specified file to connection for saving to file system.
      */
     public void saveFile(String filename, String content);
-    public JLayeredPane getConfig();
+
+    public JPanel getConfigPane();
+    
+    public JPanel getConnectionPane();
+    
 }
