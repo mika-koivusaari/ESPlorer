@@ -5,6 +5,7 @@
 package ESPlorer;
 
 import ESPlorer.Connector.Connector;
+import ESPlorer.Connector.ConnectorCallback;
 import ESPlorer.Connector.MicroPythonWebRepl;
 import java.awt.Color;
 import java.awt.Component;
@@ -40,7 +41,7 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 
-public class ESPlorer extends javax.swing.JFrame {
+public class ESPlorer extends javax.swing.JFrame implements ConnectorCallback {
 
     public static SerialPort serialPort;
     public static ArrayList<String> sendBuf;
@@ -80,6 +81,7 @@ public class ESPlorer extends javax.swing.JFrame {
         log("Create connector");
         if (connector==null) {
             connector=new MicroPythonWebRepl();
+            connector.setCallback(this);
         }
 //        connectorPane.setLayout(new FlowLayout());
         connectorPane.add(connector.getConnectionPane());
@@ -7335,7 +7337,8 @@ public class ESPlorer extends javax.swing.JFrame {
             if (UseWebRepl.isSelected()){
                 connector.open();
                 pOpen=true;
-            } else {
+                portJustOpen=false;
+        } else {
                 try {
                     String port;
                     if (UseCustomPortName.isSelected()) {
@@ -7356,6 +7359,7 @@ public class ESPlorer extends javax.swing.JFrame {
         } else {
             if (UseWebRepl.isSelected()){
                 connector.close();
+                portJustOpen=true;
             } else{
                 portClose();
             }
@@ -8100,6 +8104,16 @@ public class ESPlorer extends javax.swing.JFrame {
         FileRenamePanel.setEnabled(false);
         NodeFileManagerPane.repaint();
         FileAsButton = new ArrayList<javax.swing.JButton>();
+    }
+
+    @Override
+    public void messageReceived(String msg) {
+        TerminalAdd(msg);
+    }
+
+    @Override
+    public void connectionClosed() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private class PortNodeFilesReader implements SerialPortEventListener {
@@ -13147,7 +13161,11 @@ public class ESPlorer extends javax.swing.JFrame {
         busyIcon = !busyIcon;
         try {
             log("sending:" + s.replace("\r\n", "<CR><LF>"));
-            serialPort.writeString(s);
+            if (UseWebRepl.isSelected()){
+                connector.sendCommand(s);
+            } else{
+                serialPort.writeString(s);
+            }
         } catch (SerialPortException ex) {
             log("send FAIL:" + s.replace("\r\n", "<CR><LF>"));
         }

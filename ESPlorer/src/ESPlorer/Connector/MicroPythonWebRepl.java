@@ -32,13 +32,15 @@ public class MicroPythonWebRepl implements Connector {
     JPanel connectPane=null;
     JTextField wsaddress=null;
     
+    ConnectorCallback callback=null;
+    
     @Override
     public void open() {
         try {
             //        final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
             
             client = ClientManager.createClient();
-            session=client.connectToServer(new MPWebReplEndPoint(), new URI(wsaddress.getText()));
+            session=client.connectToServer(new MPWebReplEndPoint(callback), new URI(wsaddress.getText()));
         } catch (URISyntaxException ex) {
             Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DeploymentException ex) {
@@ -59,7 +61,11 @@ public class MicroPythonWebRepl implements Connector {
 
     @Override
     public void sendCommand(String command) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            session.getBasicRemote().sendText(command);
+        } catch (IOException ex) {
+            Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -89,6 +95,11 @@ public class MicroPythonWebRepl implements Connector {
             connectPane.add(wsaddress);
         }
         return connectPane;
+    }
+
+    @Override
+    public void setCallback(ConnectorCallback callback) {
+        this.callback=callback;
     }
     
 }

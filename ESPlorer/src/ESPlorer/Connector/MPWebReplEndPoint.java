@@ -28,6 +28,12 @@ import javax.websocket.WebSocketContainer;
     subprotocols = {"subprtotocol1", "subprotocol2"},
     configurator = ClientConfigurator.class)*/
 public class MPWebReplEndPoint{
+
+    private ConnectorCallback callback;
+    
+    public MPWebReplEndPoint(ConnectorCallback callback) {
+        this.callback=callback;
+    }
     
     @OnOpen
     public void onOpen(Session p) {
@@ -42,6 +48,7 @@ public class MPWebReplEndPoint{
     @OnMessage
     public void onMessage(String message) {
         System.out.println(String.format("%s %s", "Received message: ", message));
+        callback.messageReceived(message);
     }
     
 }

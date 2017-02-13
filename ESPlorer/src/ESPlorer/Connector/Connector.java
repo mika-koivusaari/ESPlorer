@@ -37,4 +37,5 @@ public interface Connector {
     
     public JPanel getConnectionPane();
     
+    public void setCallback(ConnectorCallback callback);
 }
