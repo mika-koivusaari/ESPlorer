@@ -12900,8 +12900,14 @@ public class ESPlorer extends javax.swing.JFrame implements ConnectorCallback {
         sendBuf = new ArrayList<String>();
         s = str.split("\r?\n");
         sendBuf.addAll(Arrays.asList(s));
-        success = SendTimerStart();
-        log("SendToESP: Starting...");
+        
+        if (UseWebRepl.isSelected()){
+            connector.sendCommands(sendBuf);
+            success=true;
+        } else {
+            success = SendTimerStart();
+            log("SendToESP: Starting...");
+        }
         return success;
     }
 

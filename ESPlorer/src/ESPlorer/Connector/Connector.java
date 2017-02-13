@@ -5,6 +5,7 @@
  */
 package ESPlorer.Connector;
 
+import java.util.ArrayList;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
@@ -28,6 +29,7 @@ public interface Connector {
      * @param command 
      */
     public void sendCommand(String command);
+    public void sendCommands(ArrayList<String> commands);
     /**
      * send Specified file to connection for saving to file system.
      */

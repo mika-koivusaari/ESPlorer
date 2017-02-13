@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLayeredPane;
@@ -67,7 +68,21 @@ public class MicroPythonWebRepl implements Connector {
             Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    @Override
+    public void sendCommands(ArrayList<String> commands) {
+        try {
+            for (String row:commands) {
+                session.getBasicRemote().sendText(row+"\r\n");
+//                Thread.sleep(500);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
+        } /*catch (InterruptedException ex) {
+            Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+    }
+    
     @Override
     public void saveFile(String filename, String content) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
