@@ -7549,7 +7549,7 @@ public class ESPlorer extends javax.swing.JFrame implements ConnectorCallback {
     }//GEN-LAST:event_SendCommandActionPerformed
 
     private void CommandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandActionPerformed
-        //log("CommandActionPerformed " + evt.getActionCommand());
+        log("CommandActionPerformed " + evt.getActionCommand());
         if ("comboBoxEdited".equals(evt.getActionCommand())) { // Hit Enter
             SendCommand.doClick();
         }

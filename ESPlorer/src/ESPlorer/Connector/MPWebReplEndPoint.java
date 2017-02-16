@@ -29,9 +29,9 @@ import javax.websocket.WebSocketContainer;
     configurator = ClientConfigurator.class)*/
 public class MPWebReplEndPoint{
 
-    private ConnectorCallback callback;
+    private MicroPythonWebRepl callback;
     
-    public MPWebReplEndPoint(ConnectorCallback callback) {
+    public MPWebReplEndPoint(MicroPythonWebRepl callback) {
         this.callback=callback;
     }
     
@@ -47,7 +47,7 @@ public class MPWebReplEndPoint{
 
     @OnMessage
     public void onMessage(String message) {
-        System.out.println(String.format("%s %s", "Received message: ", message));
+        System.out.println(String.format("%s '%s'", "Received message: ", message));
         callback.messageReceived(message);
     }
     

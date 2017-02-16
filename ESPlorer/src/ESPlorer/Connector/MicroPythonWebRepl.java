@@ -34,6 +34,8 @@ public class MicroPythonWebRepl implements Connector {
     JTextField wsaddress=null;
     
     ConnectorCallback callback=null;
+    Thread sendingThread=null;
+    String receivedMessage="";
     
     @Override
     public void open() {
@@ -41,7 +43,7 @@ public class MicroPythonWebRepl implements Connector {
             //        final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
             
             client = ClientManager.createClient();
-            session=client.connectToServer(new MPWebReplEndPoint(callback), new URI(wsaddress.getText()));
+            session=client.connectToServer(new MPWebReplEndPoint(this), new URI(wsaddress.getText()));
         } catch (URISyntaxException ex) {
             Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DeploymentException ex) {
@@ -71,16 +73,21 @@ public class MicroPythonWebRepl implements Connector {
     
     @Override
     public void sendCommands(ArrayList<String> commands) {
+        sendingThread=Thread.currentThread();
         try {
             for (String row:commands) {
                 session.getBasicRemote().sendText(row+"\r\n");
-//                Thread.sleep(500);
+                try {
+                    Thread.sleep(1000);
+                    Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.INFO, "sendComands timeout");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.INFO, "sendComands interrupted");
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
-        } /*catch (InterruptedException ex) {
-            Logger.getLogger(MicroPythonWebRepl.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
+        sendingThread=null;
     }
     
     @Override
@@ -117,4 +124,16 @@ public class MicroPythonWebRepl implements Connector {
         this.callback=callback;
     }
     
+    public void messageReceived(String msg){
+        receivedMessage=receivedMessage+msg;
+        receivedMessage=receivedMessage.substring(receivedMessage.length()-4);
+        if (receivedMessage.equals(">>> ") && sendingThread!=null){
+            sendingThread.interrupt();
+            System.out.println("Prompt, interrupt");
+        } else {
+            System.out.println(String.format("%s '%s'", "Whole message: ", receivedMessage));
+        }
+        callback.messageReceived(msg);
+    }
+
 }
